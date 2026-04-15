@@ -1,7 +1,7 @@
 const WS_URL = "ws://127.0.0.1:8765/ws";
 const MAX_BACKOFF = 30000;
 
-export function createWSConnection(onMessage) {
+export function createWSConnection({ onMessage, onStatusChange }) {
   let ws = null;
   let backoff = 1000;
   let closed = false;
@@ -14,6 +14,7 @@ export function createWSConnection(onMessage) {
     ws.onopen = () => {
       console.log("[ws] connected");
       backoff = 1000;
+      onStatusChange?.(true);
     };
 
     ws.onmessage = (event) => {
@@ -26,6 +27,7 @@ export function createWSConnection(onMessage) {
     };
 
     ws.onclose = () => {
+      onStatusChange?.(false);
       if (closed) return;
       console.log(`[ws] disconnected, reconnecting in ${backoff}ms`);
       setTimeout(connect, backoff);

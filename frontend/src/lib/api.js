@@ -22,7 +22,10 @@ export async function getStatus() {
 }
 
 export async function getHistory(params = {}) {
-  const qs = new URLSearchParams(params).toString();
+  const filtered = Object.fromEntries(
+    Object.entries(params).filter(([, v]) => v !== undefined && v !== ''),
+  );
+  const qs = new URLSearchParams(filtered).toString();
   const path = qs ? `/api/history?${qs}` : "/api/history";
   return request(path);
 }

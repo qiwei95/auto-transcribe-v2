@@ -42,16 +42,16 @@
   }
 
   onMount(async () => {
-    const ws = createWSConnection((data) => {
-      wsConnected = true;
-      handleWsMessage(data);
+    const ws = createWSConnection({
+      onMessage: handleWsMessage,
+      onStatusChange: (connected) => { wsConnected = connected; },
     });
 
     try {
       const [status, today] = await Promise.all([getStatus(), getToday()]);
-      systemStatus = status.status ?? 'idle';
       paused = status.paused ?? false;
       currentJob = status.current_job ?? null;
+      systemStatus = status.paused ? 'paused' : status.current_job ? 'processing' : 'idle';
       todayItems = today?.items ?? today ?? [];
     } catch (e) {
       console.error('Failed to fetch initial status:', e);

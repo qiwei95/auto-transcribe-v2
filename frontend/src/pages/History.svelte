@@ -138,22 +138,28 @@
       <div class="bg-[#1a1a1a] hover:bg-[#252525] rounded-xl p-4 flex items-center justify-between transition-colors cursor-default">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-8 h-8 rounded-lg bg-[#252525] flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
+            {#if item.step === 'failed'}
+              <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>
+              </svg>
+            {:else}
+              <svg class="w-4 h-4 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            {/if}
           </div>
           <div class="min-w-0">
-            <p class="text-sm text-neutral-200 truncate">{item.title ?? item.filename}</p>
+            <p class="text-sm text-neutral-200 truncate">{item.note_name || item.filename}</p>
             <div class="flex items-center gap-2 mt-1">
-              {#if item.scene}
-                <TypeBadge type={item.scene} />
+              {#if item.step === 'failed'}
+                <span class="text-xs px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20">Failed</span>
               {/if}
-              <span class="text-xs text-neutral-600">{formatDuration(item.duration)}</span>
+              <span class="text-xs text-neutral-600">{formatDuration(item.duration_sec)}</span>
             </div>
           </div>
         </div>
 
-        <span class="text-xs text-neutral-600 shrink-0 ml-3">{formatDate(item.completed_at)}</span>
+        <span class="text-xs text-neutral-600 shrink-0 ml-3">{formatDate(item.updated_at)}</span>
       </div>
     {/each}
 

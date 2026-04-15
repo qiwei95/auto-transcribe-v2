@@ -6,11 +6,22 @@
 
   let { currentJob = null, todayItems = [], paused = false, wsConnected = false } = $props();
 
+  let toast = $state(null);
+  let toastTimeout = null;
+
+  function showToast(message, type = 'success') {
+    toast = { message, type };
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => { toast = null; }, 3000);
+  }
+
   async function handleUpload(file) {
     try {
-      await uploadFile(file);
+      const result = await uploadFile(file);
+      showToast(`Queued: ${result.filename}`);
     } catch (e) {
       console.error('Upload failed:', e);
+      showToast(`Upload failed: ${e.message}`, 'error');
     }
   }
 
@@ -27,6 +38,13 @@
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 </script>
+
+{#if toast}
+  <div class="fixed top-14 right-6 z-50 px-4 py-2.5 rounded-lg text-sm shadow-lg transition-all
+    {toast.type === 'error' ? 'bg-red-500/90 text-white' : 'bg-green-500/90 text-white'}">
+    {toast.message}
+  </div>
+{/if}
 
 <div class="max-w-3xl mx-auto space-y-6">
   <!-- Header -->
@@ -70,17 +88,14 @@
                 </svg>
               </div>
               <div class="min-w-0">
-                <p class="text-sm text-neutral-200 truncate">{item.title ?? item.filename}</p>
+                <p class="text-sm text-neutral-200 truncate">{item.note_name || item.filename}</p>
                 <div class="flex items-center gap-2 mt-1">
-                  {#if item.scene}
-                    <TypeBadge type={item.scene} />
-                  {/if}
-                  <span class="text-xs text-neutral-600">{formatDuration(item.duration)}</span>
+                  <span class="text-xs text-neutral-600">{formatDuration(item.duration_sec)}</span>
                 </div>
               </div>
             </div>
 
-            <span class="text-xs text-neutral-600 shrink-0 ml-3">{formatTime(item.completed_at)}</span>
+            <span class="text-xs text-neutral-600 shrink-0 ml-3">{formatTime(item.updated_at)}</span>
           </button>
         {/each}
       </div>
