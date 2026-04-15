@@ -4,7 +4,6 @@ version = "2.0.0"
 description = "Local AI transcription + smart summaries → Obsidian notes"
 requires-python = ">=3.11"
 license = "MIT"
-readme = "README.md"
 dependencies = [
     "faster-whisper>=1.1.0",
     "fastapi>=0.115.0",
@@ -25,6 +24,16 @@ dev = ["pytest", "pytest-cov", "ruff"]
 
 [project.scripts]
 auto-transcribe = "main:cli"
+
+[tool.setuptools.packages.find]
+include = ["inputs*", "prompts*"]
+# flat-layout: 主模块是顶层 .py 文件，子包只有 inputs/ 和 prompts/
+
+[tool.setuptools]
+py-modules = [
+    "main", "config", "pipeline", "transcriber", "summarizer",
+    "dedup", "watcher", "notifier", "logger",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
