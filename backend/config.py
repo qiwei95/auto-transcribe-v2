@@ -20,14 +20,9 @@ def _detect_device() -> str:
     """自动检测最佳转录设备"""
     system = platform.system()
 
-    # macOS: 尝试 MPS (Apple Silicon Metal)
+    # macOS: Apple Silicon 不支持 CUDA，faster-whisper 用 CPU + CoreML
     if system == "Darwin":
-        try:
-            import torch
-            if torch.backends.mps.is_available():
-                return "cuda"  # faster-whisper 用 "cuda" 代表 GPU
-        except (ImportError, AttributeError):
-            pass
+        return "cpu"
 
     # Windows/Linux: 尝试 CUDA (NVIDIA)
     try:

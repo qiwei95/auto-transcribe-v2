@@ -132,6 +132,7 @@ class Pipeline:
         log(f"Processing: {file_path.name}")
         job_id = self.db.add_job(file_path.name)
         meta = meta or {}
+        proc_path: Path | None = None
 
         try:
             # 1. 等待文件就绪
@@ -269,7 +270,7 @@ class Pipeline:
             self.db.update_job(job_id, "failed", error=str(e))
             self._emit("failed", file_path.name, error=str(e))
             # 移到 failed/
-            if proc_path.exists():
+            if proc_path and proc_path.exists():
                 shutil.move(str(proc_path), str(self.config.failed_dir / proc_path.name))
             return None
 

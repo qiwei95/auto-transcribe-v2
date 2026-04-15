@@ -38,6 +38,7 @@ _icloud: ICloudSync | None = None
 _plaud: PlaudSync | None = None
 _telegram: TelegramBot | None = None
 _ws_clients: list[WebSocket] = []
+_ws_lock = threading.Lock()
 
 
 # ── WebSocket 广播 ──
@@ -50,15 +51,18 @@ def _broadcast(step: str, filename: str, extra: dict) -> None:
         "filename": filename,
         **{k: v for k, v in extra.items() if v is not None},
     })
-    # 在异步环境中广播
-    for ws in _ws_clients[:]:
+    with _ws_lock:
+        clients = _ws_clients[:]
+    for ws in clients:
         try:
             asyncio.run_coroutine_threadsafe(
                 ws.send_text(message),
                 _loop,
             )
         except Exception:
-            _ws_clients.remove(ws)
+            with _ws_lock:
+                if ws in _ws_clients:
+                    _ws_clients.remove(ws)
 
 
 _pipeline.on_progress = _broadcast
@@ -177,7 +181,11 @@ async def get_today():
 async def upload_file(file: UploadFile):
     """上传文件到 inbox/"""
     _config.inbox_dir.mkdir(parents=True, exist_ok=True)
-    dest = _config.inbox_dir / (file.filename or "upload.tmp")
+    # 安全：只取文件名，防止路径穿越
+    safe_name = Path(file.filename or "upload.tmp").name
+    if not safe_name or safe_name.startswith("."):
+        safe_name = "upload.tmp"
+    dest = _config.inbox_dir / safe_name
 
     with open(dest, "wb") as f:
         content = await file.read()
@@ -218,6 +226,25 @@ async def get_config():
         "icloud_enabled": _config.icloud_enabled,
         "telegram_configured": bool(_config.telegram_bot_token),
     }
+
+
+@app.put("/api/config")
+async def update_config(body: dict):
+    """更新配置（运行时修改，不持久化到 yaml）"""
+    updatable = {
+        "whisper_model", "whisper_language", "whisper_device",
+        "process_priority", "plaud_enabled", "icloud_enabled",
+        "obsidian_output", "captures_output",
+    }
+    changed = {}
+    for key, value in body.items():
+        if key in updatable:
+            if key in ("obsidian_output", "captures_output"):
+                setattr(_config, key, Path(value).expanduser())
+            else:
+                setattr(_config, key, value)
+            changed[key] = value
+    return {"updated": changed}
 
 
 @app.get("/api/inputs")
@@ -271,12 +298,15 @@ async def get_system_info():
 async def websocket_endpoint(ws: WebSocket):
     """实时进度推送"""
     await ws.accept()
-    _ws_clients.append(ws)
+    with _ws_lock:
+        _ws_clients.append(ws)
     try:
         while True:
             await ws.receive_text()  # keep alive
     except WebSocketDisconnect:
-        _ws_clients.remove(ws)
+        with _ws_lock:
+            if ws in _ws_clients:
+                _ws_clients.remove(ws)
 
 
 # ── CLI 入口 ──

@@ -240,6 +240,13 @@ async def download_douyin_direct(url: str, inbox: Path) -> Path | None:
             return None
 
         play_url = url_list[0].replace("/playwm/", "/play/")
+
+        # 安全检查：防止 SSRF，只允许 https 和已知域名
+        safe, reason = is_safe_url(play_url)
+        if not safe:
+            log(f"[telegram] Douyin play_url unsafe: {reason}")
+            return None
+
         desc = item.get("desc", "") or video_id
         safe_name = sanitize_filename(desc)
         output_path = inbox / f"{safe_name}.mp3"

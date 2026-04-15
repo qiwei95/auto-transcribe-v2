@@ -4,11 +4,11 @@
   import { getConfig, getSystemInfo } from '../lib/api.js';
 
   let config = $state({
-    model: 'large-v3-turbo',
-    device: 'auto',
-    language: 'zh',
-    obsidian_path: '',
-    captures_path: '',
+    whisper_model: 'large-v3-turbo',
+    whisper_device: 'auto',
+    whisper_language: 'zh',
+    obsidian_output: '',
+    captures_output: '',
     telegram_configured: false,
     plaud_enabled: false,
     icloud_enabled: false,
@@ -16,10 +16,11 @@
   });
 
   let system = $state({
-    cpu: '',
-    memory: '',
+    platform: '',
+    machine: '',
     gpu: '',
-    version: '',
+    python: '',
+    node: '',
   });
 
   let saving = $state(false);
@@ -105,8 +106,8 @@
           <p class="text-xs text-neutral-500 mt-0.5">Larger models are more accurate but slower</p>
         </div>
         <select
-          value={config.model}
-          onchange={(e) => handleConfigChange('model', e.target.value)}
+          value={config.whisper_model}
+          onchange={(e) => handleConfigChange('whisper_model', e.target.value)}
           class="bg-[#252525] border border-neutral-700 rounded-lg px-3 py-1.5 text-sm text-neutral-200 focus:outline-none focus:border-blue-500/50 cursor-pointer"
         >
           {#each models as m}
@@ -122,8 +123,8 @@
           <p class="text-xs text-neutral-500 mt-0.5">Hardware acceleration for transcription</p>
         </div>
         <select
-          value={config.device}
-          onchange={(e) => handleConfigChange('device', e.target.value)}
+          value={config.whisper_device}
+          onchange={(e) => handleConfigChange('whisper_device', e.target.value)}
           class="bg-[#252525] border border-neutral-700 rounded-lg px-3 py-1.5 text-sm text-neutral-200 focus:outline-none focus:border-blue-500/50 cursor-pointer"
         >
           {#each devices as d}
@@ -140,8 +141,8 @@
         </div>
         <input
           type="text"
-          value={config.language}
-          onchange={(e) => handleConfigChange('language', e.target.value)}
+          value={config.whisper_language}
+          onchange={(e) => handleConfigChange('whisper_language', e.target.value)}
           class="bg-[#252525] border border-neutral-700 rounded-lg px-3 py-1.5 text-sm text-neutral-200 w-20 text-center focus:outline-none focus:border-blue-500/50"
           placeholder="zh"
         />
@@ -159,13 +160,13 @@
         <div class="flex gap-2">
           <input
             type="text"
-            value={config.obsidian_path}
-            onchange={(e) => handleConfigChange('obsidian_path', e.target.value)}
+            value={config.obsidian_output}
+            onchange={(e) => handleConfigChange('obsidian_output', e.target.value)}
             class="flex-1 bg-[#252525] border border-neutral-700 rounded-lg px-3 py-1.5 text-sm text-neutral-300 focus:outline-none focus:border-blue-500/50 font-mono text-xs"
             placeholder="~/Documents/Obsidian Vault/"
           />
           <button
-            onclick={() => pickFolder('obsidian_path')}
+            onclick={() => pickFolder('obsidian_output')}
             class="px-3 py-1.5 bg-[#252525] border border-neutral-700 rounded-lg text-sm text-neutral-400 hover:text-neutral-200 hover:border-neutral-600 transition-colors shrink-0"
           >
             Browse
@@ -179,13 +180,13 @@
         <div class="flex gap-2">
           <input
             type="text"
-            value={config.captures_path}
-            onchange={(e) => handleConfigChange('captures_path', e.target.value)}
+            value={config.captures_output}
+            onchange={(e) => handleConfigChange('captures_output', e.target.value)}
             class="flex-1 bg-[#252525] border border-neutral-700 rounded-lg px-3 py-1.5 text-sm text-neutral-300 focus:outline-none focus:border-blue-500/50 font-mono text-xs"
             placeholder="~/Documents/captures/"
           />
           <button
-            onclick={() => pickFolder('captures_path')}
+            onclick={() => pickFolder('captures_output')}
             class="px-3 py-1.5 bg-[#252525] border border-neutral-700 rounded-lg text-sm text-neutral-400 hover:text-neutral-200 hover:border-neutral-600 transition-colors shrink-0"
           >
             Browse
@@ -267,16 +268,10 @@
       <div class="border-t border-neutral-800 pt-5 space-y-3">
         <p class="text-sm text-neutral-200 mb-3">System Info</p>
         <div class="grid grid-cols-2 gap-3 text-xs">
-          {#if system.cpu}
+          {#if system.platform}
             <div class="bg-[#252525] rounded-lg p-3">
-              <p class="text-neutral-500 mb-1">CPU</p>
-              <p class="text-neutral-300 font-mono">{system.cpu}</p>
-            </div>
-          {/if}
-          {#if system.memory}
-            <div class="bg-[#252525] rounded-lg p-3">
-              <p class="text-neutral-500 mb-1">Memory</p>
-              <p class="text-neutral-300 font-mono">{system.memory}</p>
+              <p class="text-neutral-500 mb-1">Platform</p>
+              <p class="text-neutral-300 font-mono">{system.platform} ({system.machine})</p>
             </div>
           {/if}
           {#if system.gpu}
@@ -285,10 +280,16 @@
               <p class="text-neutral-300 font-mono">{system.gpu}</p>
             </div>
           {/if}
-          {#if system.version}
+          {#if system.python}
             <div class="bg-[#252525] rounded-lg p-3">
-              <p class="text-neutral-500 mb-1">Version</p>
-              <p class="text-neutral-300 font-mono">{system.version}</p>
+              <p class="text-neutral-500 mb-1">Python</p>
+              <p class="text-neutral-300 font-mono">{system.python}</p>
+            </div>
+          {/if}
+          {#if system.node}
+            <div class="bg-[#252525] rounded-lg p-3">
+              <p class="text-neutral-500 mb-1">Host</p>
+              <p class="text-neutral-300 font-mono">{system.node}</p>
             </div>
           {/if}
         </div>
