@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.db
+*.db-journal
+.env
+.venv/
+venv/
+
+# Config (keep example, ignore user config)
+backend/config.yaml
+!backend/config.example.yaml
+
+# Node.js
+node_modules/
+.svelte-kit/
+frontend/dist/
+
+# Rust / Tauri
+target/
+frontend/src-tauri/target/
+frontend/src-tauri/gen/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Project-specific working directories
+inbox/
+processing/
+done/
+failed/
+transcripts/
+*.meta
+plaud-pulled.json
+cookies.txt
+
+# Logs
+*.log

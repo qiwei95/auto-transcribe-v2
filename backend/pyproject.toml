@@ -1,0 +1,35 @@
+[project]
+name = "auto-transcribe"
+version = "2.0.0"
+description = "Local AI transcription + smart summaries → Obsidian notes"
+requires-python = ">=3.11"
+license = "MIT"
+readme = "README.md"
+dependencies = [
+    "faster-whisper>=1.1.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]",
+    "PyYAML",
+    "httpx",
+    "watchdog",
+    "filelock",
+    "plyer",
+    "python-multipart",
+    "websockets",
+]
+
+[project.optional-dependencies]
+telegram = ["python-telegram-bot>=21.0"]
+youtube = ["youtube-transcript-api"]
+dev = ["pytest", "pytest-cov", "ruff"]
+
+[project.scripts]
+auto-transcribe = "main:cli"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100

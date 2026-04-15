@@ -1,0 +1,59 @@
+# Auto-Transcribe Configuration
+# Copy to config.yaml and edit.
+#
+# Search order:
+#   1. ./config.yaml (project directory)
+#   2. ~/.config/auto-transcribe/config.yaml (user directory)
+#   3. defaults
+
+# ── Paths ──────────────────────────────────────
+
+# Project root (inbox/, processing/, done/ etc. live here)
+base_dir: ~/auto-transcribe
+
+# Obsidian output for recording notes
+obsidian_output: ~/Documents/Obsidian Vault/recording-notes
+
+# Obsidian output for social media captures
+captures_output: ~/Documents/Obsidian Vault/social-captures
+
+# ── Transcription Engine ───────────────────────
+
+# Whisper model: tiny / base / small / medium / large-v3-turbo
+whisper_model: large-v3-turbo
+
+# Language: zh / en / ja / ko / auto
+whisper_language: zh
+
+# Device: auto (detect GPU) / cuda (NVIDIA) / cpu
+whisper_device: auto
+
+# Max CPU threads (only affects CPU mode)
+whisper_threads: 4
+
+# ── Process Priority ──────────────────────────
+
+# Lower priority so transcription doesn't slow your other apps
+# normal / below_normal / low
+process_priority: below_normal
+
+# ── Claude CLI ─────────────────────────────────
+
+# Timeout per Claude call (seconds)
+claude_timeout: 1800
+
+# Max retries on failure
+claude_max_retries: 3
+
+# ── Integrations (optional) ───────────────────
+
+# Telegram Bot — set token here or via TELEGRAM_BOT_TOKEN env var
+# telegram_bot_token: ""
+# telegram_allowed_users: [123456789]
+
+# Plaud recording device cloud sync
+# plaud_enabled: false
+
+# iCloud sync (macOS only)
+# icloud_enabled: false
+# icloud_inbox: ~/Library/Mobile Documents/com~apple~CloudDocs/录音收件箱
